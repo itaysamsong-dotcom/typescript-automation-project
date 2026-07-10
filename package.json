@@ -2,10 +2,15 @@
   "scripts": {
     "test": "playwright test",
     "test:headed": "playwright test --headed",
-    "test:ui": "playwright test --ui"
+    "test:ui": "playwright test --ui",
+    "report:allure": "allure generate allure-results -o allure-report",
+    "report:allure:open": "allure open allure-report",
+    "report:allure:serve": "allure generate allure-results --open"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
-    "@types/node": "^25.9.1"
+    "@types/node": "^25.9.1",
+    "allure": "^3.14.2",
+    "allure-playwright": "^3.10.2"
   }
 }

@@ -3,7 +3,10 @@ import { baseUrls } from "./src/config/routes";
 
 export default defineConfig({
   testDir: "./src/tests",
-  reporter: "html",
+  reporter: [
+    ["html"],
+    ["allure-playwright", { resultsDir: "allure-results" }],
+  ],
   timeout: 30_000,
   retries: 2,
   maxFailures: undefined,

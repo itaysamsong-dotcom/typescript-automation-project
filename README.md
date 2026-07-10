@@ -1,4 +1,4 @@
-# 818 Automation
+# Typescript Test project
 
 End-to-end test automation project built with Playwright and TypeScript.
 
@@ -43,10 +43,24 @@ npm run test:ui
 
 ## Test Reports
 
-Playwright generates an HTML report after a test run. Open the latest report with:
+Each test run generates both Playwright HTML and Allure result files. Open the
+latest Playwright report with:
 
 ```bash
 npx playwright show-report
+```
+
+Generate and open a persistent Allure HTML report with:
+
+```bash
+npm run report:allure
+npm run report:allure:open
+```
+
+To generate and open an Allure report in one command, run:
+
+```bash
+npm run report:allure:serve
 ```
 
 ## Main Code Components
@@ -104,7 +118,8 @@ development.
 
 `src/config/routes.ts` stores the application and API base URLs together with
 the routes used by the tests. `playwright.config.ts` configures Chromium, test
-timeouts, retries, screenshots, traces, and the HTML reporter.
+timeouts, retries, screenshots, traces, and the Playwright HTML and Allure
+reporters.
 
 ### Test Flow
 
