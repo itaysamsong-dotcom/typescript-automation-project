@@ -10,7 +10,7 @@ import { endpoint } from "./commonUtils";
 import { loginUser } from "./loginUtils";
 import { fillBillingAddress } from "./registerUtils";
 
-export async function addItemToShoppingCart(
+export async function addItemsToCart(
   page: Page,
   productId: string,
   product: productType,

@@ -3,7 +3,7 @@ import { loginUsers } from "../testData/loginTestData";
 import { products } from "../testData/productTestData";
 import { billingAddress } from "../testData/registerTestData";
 import {
-  addItemToShoppingCart,
+  addItemsToCart,
   checkProductCreation,
   proceedToCheckout,
 } from "../utils/checkoutUtils";
@@ -16,7 +16,7 @@ test.describe("Shopping working tools tests", () => {
     product,
     productId,
   }) => {
-    await addItemToShoppingCart(page, productId, product);
+    await addItemsToCart(page, productId, product);
     await proceedToCheckout(page, loginUsers.approved, billingAddress);
     await checkProductCreation(page);
   });
