@@ -29,7 +29,7 @@ async function applyMaximumPriceFilter(
 
   if (nativeRangeCount > 0) {
     const maximumRange = nativeRanges.nth(nativeRangeCount - 1);
-    const responsePromise = waitForProductsResponse(page).catch(() => undefined);
+    const responsePromise = waitForProductsResponse(page);
     await maximumRange.evaluate((element, requestedPrice) => {
       const input = element as HTMLInputElement;
       const minimum = Number(input.min || 0);
@@ -53,23 +53,29 @@ async function applyMaximumPriceFilter(
   );
   const step = Number((await maximumSlider.getAttribute("aria-valuestep")) ?? 1);
   const target = Math.min(maximum, Math.max(minimum, maxPrice));
-  const increments = Math.max(0, Math.round((target - minimum) / step));
   await maximumSlider.focus();
 
-  if (increments === 0) {
-    const responsePromise = waitForProductsResponse(page).catch(() => undefined);
-    await maximumSlider.press("Home");
-    await responsePromise;
-    return;
-  }
-
+  let responsePromise = waitForProductsResponse(page);
   await maximumSlider.press("Home");
-  for (let increment = 1; increment < increments; increment += 1) {
-    await maximumSlider.press("ArrowRight");
-  }
-  const responsePromise = waitForProductsResponse(page).catch(() => undefined);
-  await maximumSlider.press("ArrowRight");
   await responsePromise;
+
+  let currentValue = Number(
+    (await maximumSlider.getAttribute("aria-valuenow")) ?? minimum,
+  );
+
+  while (currentValue < target) {
+    responsePromise = waitForProductsResponse(page);
+    await maximumSlider.press("ArrowRight");
+    await responsePromise;
+
+    const nextValue = Number(
+      (await maximumSlider.getAttribute("aria-valuenow")) ?? currentValue + step,
+    );
+    if (nextValue <= currentValue) {
+      throw new Error("The maximum-price slider did not advance.");
+    }
+    currentValue = nextValue;
+  }
 }
 
 export async function searchItemsByNameUnderPrice(
