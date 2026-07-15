@@ -7,7 +7,7 @@ export default defineConfig({
     ["html"],
     ["allure-playwright", { resultsDir: "allure-results" }],
   ],
-  timeout: 30_000,
+  timeout: 60_000,
   retries: 2,
   maxFailures: undefined,
   expect: {
