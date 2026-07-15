@@ -4,6 +4,7 @@ export const baseUrls = {
 };
 
 export const urlPaths = {
+  home: "/",
   login: "/auth/login",
   account: "/account",
   adminDashboard: "/admin/dashboard",
