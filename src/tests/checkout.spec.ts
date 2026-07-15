@@ -4,6 +4,7 @@ import { products } from "../testData/productTestData";
 import { billingAddress } from "../testData/registerTestData";
 import {
   addItemsToCart,
+  assertCartTotalNotExceeds,
   checkProductCreation,
   proceedToCheckout,
 } from "../utils/checkoutUtils";
@@ -17,6 +18,7 @@ test.describe("Shopping working tools tests", () => {
     productId,
   }) => {
     await addItemsToCart(page, productId, product);
+    await assertCartTotalNotExceeds(page, product.unitPrice, 2);
     await proceedToCheckout(page, loginUsers.approved, billingAddress);
     await checkProductCreation(page);
   });

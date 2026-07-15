@@ -1,4 +1,4 @@
-import { expect, type Page } from "@playwright/test";
+import { expect, type Page, type Response } from "@playwright/test";
 import { baseUrls, urlPaths } from "../config/routes";
 import { checkoutLabels, checkoutSelectors } from "../mapping/checkout";
 import { productsSelectors } from "../mapping/productMapping";
@@ -16,7 +16,6 @@ export async function addItemsToCart(
   product: productType,
 ) {
   await expect(page).toHaveURL(endpoint(`${urlPaths.product}/${productId}`));
-  await page.getByTestId(productsSelectors.addToCart).click();
   await expect(page.getByTestId(productsSelectors.productName)).toHaveText(
     product.name,
   );
@@ -27,6 +26,53 @@ export async function addItemsToCart(
 
   await page.getByTestId(productsSelectors.increaseQuantity).click();
   await expect(page.getByTestId(productsSelectors.quantity)).toHaveValue("2");
+
+  const addItemResponsePromise = page.waitForResponse(isAddItemResponse);
+  await page.getByTestId(productsSelectors.addToCart).click();
+  const addItemResponse = await addItemResponsePromise;
+
+  if (!addItemResponse.ok()) {
+    throw new Error(
+      `Adding the product to the cart failed with status ${addItemResponse.status()}.`,
+    );
+  }
+}
+
+function isAddItemResponse(response: Response): boolean {
+  const url = new URL(response.url());
+  return (
+    response.request().method() === "POST" &&
+    url.origin === baseUrls.api &&
+    /^\/carts\/[^/]+$/.test(url.pathname)
+  );
+}
+
+export async function assertCartTotalNotExceeds(
+  page: Page,
+  budgetPerItem: number,
+  itemsCount: number,
+): Promise<void> {
+  await page.goto(urlPaths.checkout);
+  await expect(page).toHaveURL(endpoint(urlPaths.checkout));
+
+  const cartTotal = page.getByTestId(checkoutSelectors.cartTotal);
+  await expect(cartTotal).toBeVisible();
+
+  const displayedTotal = await cartTotal.innerText();
+  const total = Number(displayedTotal.replace(/[^\d.,-]/g, "").replace(",", "."));
+  const maximumTotal = budgetPerItem * itemsCount;
+
+  expect(
+    Number.isFinite(total),
+    `Could not parse the cart total from "${displayedTotal}".`,
+  ).toBe(true);
+
+  await page.screenshot({ path: "test-results/cart-total.png", fullPage: true });
+
+  expect(
+    total,
+    `Cart total ${total} exceeds the allowed total ${maximumTotal}.`,
+  ).toBeLessThanOrEqual(maximumTotal);
 }
 
 export async function proceedToCheckout(

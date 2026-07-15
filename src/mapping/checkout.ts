@@ -1,4 +1,5 @@
 export const checkoutSelectors = {
+  cartTotal: "cart-total",
   continueShopping: "continue-shopping",
   paymentMethod: "payment-method",
   proceedToLogin: "proceed-1",
